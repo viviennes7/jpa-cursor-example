@@ -5,7 +5,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BoardService {
@@ -19,7 +18,7 @@ public class BoardService {
     public List<Board> getBoards(@Nullable Long id, Pageable page) {
         final List<Board> boards;
 
-        if(id == null) {
+        if (id == null) {
             boards = this.boardRepository.findAllByOrderByIdDesc(page);
         } else {
             boards = this.boardRepository.findByIdLessThanOrderByIdDesc(id, page);
