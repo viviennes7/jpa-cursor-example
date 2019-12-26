@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    public List<Board> findAllByOrderByIdDesc(Pageable page);
+    List<Board> findAllByOrderByIdDesc(Pageable page);
 
-    public List<Board> findByIdLessThanOrderByIdDesc(Long id, Pageable page);
+    List<Board> findByIdLessThanOrderByIdDesc(Long id, Pageable page);
+
+    Boolean existsByIdLessThan(Long id);
 }

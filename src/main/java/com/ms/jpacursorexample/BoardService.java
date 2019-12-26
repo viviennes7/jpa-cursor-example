@@ -1,7 +1,6 @@
 package com.ms.jpacursorexample;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,15 +14,22 @@ public class BoardService {
         this.boardRepository = boardRepository;
     }
 
-    public List<Board> getBoards(@Nullable Long id, Pageable page) {
-        final List<Board> boards;
+    CursorResult<Board> get(Long cursorId, Pageable page) {
+        final List<Board> boards = getBoards(cursorId, page);
+        final Long lastIdOfList = boards.isEmpty() ?
+                null : boards.get(boards.size() - 1).getId();
 
-        if (id == null) {
-            boards = this.boardRepository.findAllByOrderByIdDesc(page);
-        } else {
-            boards = this.boardRepository.findByIdLessThanOrderByIdDesc(id, page);
-        }
+        return new CursorResult<>(boards, hasNext(lastIdOfList));
+    }
 
-        return boards;
+    private List<Board> getBoards(Long id, Pageable page) {
+        return id == null ?
+                this.boardRepository.findAllByOrderByIdDesc(page) :
+                this.boardRepository.findByIdLessThanOrderByIdDesc(id, page);
+    }
+
+    private Boolean hasNext(Long id) {
+        if (id == null) return false;
+        return this.boardRepository.existsByIdLessThan(id);
     }
 }

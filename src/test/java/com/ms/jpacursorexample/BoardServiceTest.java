@@ -8,9 +8,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -23,19 +23,30 @@ class BoardServiceTest {
 
     @Test
     void cursor방식_조회() {
-        final List<Board> firstSelection = this.boardService.getBoards(null, page);
-        final Long lastIndexOfFirst = firstSelection.get(9).getId();
+        final CursorResult<Board> firstSelection = this.boardService.get(null, page);
+        final Long lastIndexOfFirst = firstSelection.getValues().get(9).getId();
         assertThat(lastIndexOfFirst).isEqualTo(20);
-        assertThat(firstSelection.size()).isEqualTo(10);
+        assertThat(firstSelection.getValues().size()).isEqualTo(10);
+        assertTrue(firstSelection.getHasNext());
 
-        final List<Board> secondSelection = this.boardService.getBoards(lastIndexOfFirst, page);
-        final Long lastIndexOfSecond = secondSelection.get(9).getId();
+        final CursorResult<Board> secondSelection = this.boardService.get(lastIndexOfFirst, page);
+        final Long lastIndexOfSecond = secondSelection.getValues().get(9).getId();
         assertThat(lastIndexOfSecond).isEqualTo(10);
-        assertThat(secondSelection.size()).isEqualTo(10);
+        assertThat(secondSelection.getValues().size()).isEqualTo(10);
+        assertTrue(secondSelection.getHasNext());
 
-        final List<Board> thirdSelection = this.boardService.getBoards(lastIndexOfSecond, page);
-        final Long lastIndexOfThird = thirdSelection.get(8).getId();
+        final CursorResult<Board> thirdSelection = this.boardService.get(lastIndexOfSecond, page);
+        final Long lastIndexOfThird = thirdSelection.getValues().get(8).getId();
         assertThat(lastIndexOfThird).isEqualTo(1);
-        assertThat(thirdSelection.size()).isEqualTo(9);
+        assertThat(thirdSelection.getValues().size()).isEqualTo(9);
+        assertFalse(thirdSelection.getHasNext());
     }
+
+    @Test
+    void 조회결과물이_없는_경우() {
+        final CursorResult<Board> result = this.boardService.get(Long.MIN_VALUE, page);
+        assertThat(result.getValues()).isEmpty();
+        assertFalse(result.getHasNext());
+    }
+
 }
