@@ -3,6 +3,7 @@ package com.ms.jpacursorexample;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,9 @@ class BoardServiceTest {
     @Autowired
     private BoardService boardService;
 
+    /**
+     * @see JpaCursorExampleApplication.DummyLoader#run(ApplicationArguments) 에서 게시글 생성함
+     */
     @Test
     void cursor방식_조회() {
         final CursorResult<Board> firstSelection = this.boardService.get(null, page);
